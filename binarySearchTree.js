@@ -27,43 +27,88 @@ class Tree {
     return rootNode;
   }
 
-  insert(value, root = this.root) {
-    if (root === null) return (this.root = new Node(value));
+  find(value, root = this.root) {
+    if (root === null) {
+      return `${value} does not exist in the tree.`;
+    }
+    if (value === root.data) {
+      return root;
+    } else if (value < root.data) {
+      return this.find(value, root.left);
+    } else if (value > root.data) {
+      return this.find(value, root.right);
+    }
+  }
 
-    if (value === root.data)
-      return console.log(
-        `${value} is already in the tree, so was not inserted.`
-      );
+  insert(value, root = this.root) {
+    if (root === null) {
+      this.root = new Node(value);
+      return;
+    }
+
+    if (value === root.data) {
+      console.log(`${value} is already in the tree, so was not inserted.`);
+      return;
+    }
 
     if (value < root.data) {
-      if (root.left === null) return (root.left = new Node(value));
+      if (root.left === null) {
+        root.left = new Node(value);
+        return;
+      }
       this.insert(value, root.left);
     } else if (value > root.data) {
-      if (root.right === null) return (root.right = new Node(value));
+      if (root.right === null) {
+        root.right = new Node(value);
+        return;
+      }
       this.insert(value, root.right);
     }
   }
 
   delete(value, root = this.root) {
-    if (value === root.data) {
-      if (root.left === null && root.right === null) {
-        return (this.root = null);
-      }
-    } else if (value < root.data) {
-      if (root.left === null)
-        return console.log(
-          `${value} does not exist in the tree, so can't be deleted.`
-        );
-      if (value === root.left.data) return (root.left = null);
-      this.delete(value, root.left);
-    } else if (value > root.data) {
-      if (root.right === null)
-        return console.log(
-          `${value} does not exist in the tree, so can't be deleted.`
-        );
-      if (value === root.right.data) return (root.right = null);
-      this.delete(value, root.right);
+    // Can't find value in tree
+    if (root === null) {
+      console.log(
+        `${value} could not be found in the tree, so could not be deleted.`
+      );
+      return null;
     }
+    // Searching for value
+    else if (value < root.data) {
+      root.left = this.delete(value, root.left);
+      return root;
+    } else if (value > root.data) {
+      root.right = this.delete(value, root.right);
+      return root;
+    }
+    // value found
+    else if (value === root.data) {
+      // no children delete
+      if (root.left === null && root.right === null) {
+        return null;
+      }
+      // one child delete
+      if (root.left === null) {
+        return root.right;
+      } else if (root.right === null) {
+        return root.left;
+      }
+      // two child delete
+      if (root.left && root.right) {
+        let largestLeft = this.findLargestNode(root.left);
+        root.data = largestLeft.data;
+        root.left = this.delete(largestLeft.data, root.left);
+        return root;
+      }
+    }
+  }
+
+  findLargestNode(node) {
+    while (node.right !== null) {
+      node = node.right;
+    }
+    return node;
   }
 }
 
@@ -86,4 +131,6 @@ tree.insert(9);
 tree.insert(1000);
 tree.insert(800);
 tree.insert(123);
+tree.insert(100);
+console.log(tree.find(1));
 prettyPrint(tree.root);
