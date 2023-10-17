@@ -12,6 +12,7 @@ class Tree {
       .sort((a, b) => a - b)
       .filter((item, index) => array.indexOf(item) === index);
     this.root = this.buildTree(sortedArray);
+    console.log("New tree created.");
   }
 
   buildTree(array) {
@@ -125,44 +126,61 @@ class Tree {
       if (currentNode.right !== null) queue.push(currentNode.right);
       queue.shift();
     }
-    if (Array.isArray(func)) return console.log(func);
+    if (Array.isArray(func)) return console.log(`Level order -> ${func}`);
     else return;
   }
-  inorder(func = [], root = this.root) {
+
+  inorderRecursion(func = [], root = this.root) {
     if (root === null) return;
-    this.inorder(func, root.left);
+    this.inorderRecursion(func, root.left);
     if (Array.isArray(func)) {
       func.push(root.data);
     } else {
       func(root);
     }
-    this.inorder(func, root.right);
-    if (Array.isArray(func) && root === this.root) console.log(func);
+    this.inorderRecursion(func, root.right);
+    if (Array.isArray(func) && root === this.root) return func;
+  }
+
+  inorder(func = [], root = this.root) {
+    let result = this.inorderRecursion(func, root);
+    if (Array.isArray(result)) console.log(`In order -> ${result}`);
+  }
+
+  preorderRecursion(func = [], root = this.root) {
+    if (root === null) return;
+    if (Array.isArray(func)) {
+      func.push(root.data);
+    } else {
+      func(root);
+    }
+    this.preorderRecursion(func, root.left);
+    this.preorderRecursion(func, root.right);
+    if (Array.isArray(func) && root === this.root) return func;
   }
 
   preorder(func = [], root = this.root) {
+    let result = this.preorderRecursion(func, root);
+    if (Array.isArray(result)) console.log(`Pre order -> ${result}`);
+  }
+
+  postorderRecursion(func = [], root = this.root) {
     if (root === null) return;
+    this.postorderRecursion(func, root.left);
+    this.postorderRecursion(func, root.right);
     if (Array.isArray(func)) {
       func.push(root.data);
     } else {
       func(root);
     }
-    this.preorder(func, root.left);
-    this.preorder(func, root.right);
-    if (Array.isArray(func) && root === this.root) console.log(func);
+    if (Array.isArray(func) && root === this.root) return func;
   }
 
   postorder(func = [], root = this.root) {
-    if (root === null) return;
-    this.postorder(func, root.left);
-    this.postorder(func, root.right);
-    if (Array.isArray(func)) {
-      func.push(root.data);
-    } else {
-      func(root);
-    }
-    if (Array.isArray(func) && root === this.root) console.log(func);
+    let result = this.postorderRecursion(func, root);
+    if (Array.isArray(result)) console.log(`Post order -> ${result}`);
   }
+
   height(root = this.root) {
     if (root === null) return -1;
     else {
@@ -184,29 +202,93 @@ class Tree {
 
     return dist;
   }
+
+  isBalancedRecursion(root) {
+    if (root === null) return 0;
+    let leftSubTreeHeight = this.height(root.left);
+    if (leftSubTreeHeight === -1) return -1;
+    let rightSubTreeHeight = this.height(root.right);
+    if (rightSubTreeHeight === -1) return -1;
+
+    if (Math.abs(leftSubTreeHeight - rightSubTreeHeight) > 1) return -1;
+
+    return Math.max(leftSubTreeHeight, rightSubTreeHeight) + 1;
+  }
+
+  isBalanced(root = this.root) {
+    if (this.isBalancedRecursion(root) === -1) {
+      console.log(
+        `The tree starting at root node with value ${root.data} is not balanced.`
+      );
+    } else {
+      console.log(
+        `The tree starting at root node with value ${root.data} is balanced.`
+      );
+    }
+  }
+
+  rebalance() {
+    const array = this.inorderRecursion();
+    const newRoot = this.buildTree(array);
+    this.root = newRoot;
+    console.log("Tree rebalanced.");
+  }
+
+  prettyPrint = (node = this.root, prefix = "", isLeft = true) => {
+    if (node === null) {
+      return;
+    }
+    if (node.right !== null) {
+      this.prettyPrint(
+        node.right,
+        `${prefix}${isLeft ? "│   " : "    "}`,
+        false
+      );
+    }
+    console.log(`${prefix}${isLeft ? "└── " : "┌── "}${node.data}`);
+    if (node.left !== null) {
+      this.prettyPrint(node.left, `${prefix}${isLeft ? "    " : "│   "}`, true);
+    }
+  };
 }
 
-const prettyPrint = (node, prefix = "", isLeft = true) => {
-  if (node === null) {
-    return;
+function driverScript() {
+  function randomArray() {
+    let randomArray = [];
+    for (let i = 0; i < Math.max(10, Math.floor(Math.random() * 100)); i++) {
+      const randomNumber = Math.floor(Math.random() * 100);
+      randomArray.push(randomNumber);
+    }
+    return randomArray;
   }
-  if (node.right !== null) {
-    prettyPrint(node.right, `${prefix}${isLeft ? "│   " : "    "}`, false);
-  }
-  console.log(`${prefix}${isLeft ? "└── " : "┌── "}${node.data}`);
-  if (node.left !== null) {
-    prettyPrint(node.left, `${prefix}${isLeft ? "    " : "│   "}`, true);
-  }
-};
 
-// const tree = new Tree([789, 1, 3, 33, 123, 55, 1, 2, 3, 4, 5]);
-const tree = new Tree([1, 2, 3]);
-// tree.insert(9);
-// tree.insert(1000);
-// tree.insert(800);
-// tree.insert(123);
-// tree.insert(100);
-// console.log(tree.find(1));
-// tree.levelOrder((n) => (n.data = n.data * 2));
-prettyPrint(tree.root);
-console.log(tree.depth(tree.find(8)));
+  function insertRandomNumbers() {
+    let array = [];
+    for (let i = 0; i < 10; i++) {
+      const randomNumber = 100 + Math.floor(Math.random() * 100);
+      tree.insert(randomNumber);
+      array.push(randomNumber);
+    }
+    console.log(`The following numbers inserted -> ${array}`);
+  }
+
+  const tree = new Tree(randomArray());
+  tree.prettyPrint();
+  tree.isBalanced();
+  tree.levelOrder();
+  tree.inorder();
+  tree.preorder();
+  tree.postorder();
+  insertRandomNumbers();
+  tree.prettyPrint();
+  tree.isBalanced();
+  tree.rebalance();
+  tree.prettyPrint();
+  tree.isBalanced();
+  tree.levelOrder();
+  tree.inorder();
+  tree.preorder();
+  tree.postorder();
+}
+
+driverScript();
