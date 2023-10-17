@@ -137,7 +137,7 @@ class Tree {
       func(root);
     }
     this.inorder(func, root.right);
-    if (Array.isArray(func) && root === this.root) return console.log(func);
+    if (Array.isArray(func) && root === this.root) console.log(func);
   }
 
   preorder(func = [], root = this.root) {
@@ -149,7 +149,7 @@ class Tree {
     }
     this.preorder(func, root.left);
     this.preorder(func, root.right);
-    if (Array.isArray(func) && root === this.root) return console.log(func);
+    if (Array.isArray(func) && root === this.root) console.log(func);
   }
 
   postorder(func = [], root = this.root) {
@@ -161,7 +161,28 @@ class Tree {
     } else {
       func(root);
     }
-    if (Array.isArray(func) && root === this.root) return console.log(func);
+    if (Array.isArray(func) && root === this.root) console.log(func);
+  }
+  height(root = this.root) {
+    if (root === null) return -1;
+    else {
+      let leftHeight = this.height(root.left);
+      let rightHeight = this.height(root.right);
+      return Math.max(leftHeight, rightHeight) + 1;
+    }
+  }
+
+  depth(node, root = this.root) {
+    if (root == null) return -1;
+    var dist = -1;
+    if (
+      root == node ||
+      (dist = this.depth(node, root.left)) >= 0 ||
+      (dist = this.depth(node, root.right)) >= 0
+    )
+      return dist + 1;
+
+    return dist;
   }
 }
 
@@ -178,14 +199,14 @@ const prettyPrint = (node, prefix = "", isLeft = true) => {
   }
 };
 
-const tree = new Tree([789, 1, 3, 33, 123, 55, 1, 2, 3, 4, 5]);
-// const tree = new Tree([789]);
-tree.insert(9);
-tree.insert(1000);
-tree.insert(800);
-tree.insert(123);
-tree.insert(100);
-console.log(tree.find(1));
+// const tree = new Tree([789, 1, 3, 33, 123, 55, 1, 2, 3, 4, 5]);
+const tree = new Tree([1, 2, 3]);
+// tree.insert(9);
+// tree.insert(1000);
+// tree.insert(800);
+// tree.insert(123);
+// tree.insert(100);
+// console.log(tree.find(1));
 // tree.levelOrder((n) => (n.data = n.data * 2));
-tree.postorder();
 prettyPrint(tree.root);
+console.log(tree.depth(tree.find(8)));
