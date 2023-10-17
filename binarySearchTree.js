@@ -110,6 +110,59 @@ class Tree {
     }
     return node;
   }
+
+  levelOrder(func = [], root = this.root) {
+    if (root === null) return;
+    let queue = [root];
+    while (queue.length > 0) {
+      let currentNode = queue[0];
+      if (Array.isArray(func)) {
+        func.push(currentNode.data);
+      } else {
+        func(currentNode);
+      }
+      if (currentNode.left !== null) queue.push(currentNode.left);
+      if (currentNode.right !== null) queue.push(currentNode.right);
+      queue.shift();
+    }
+    if (Array.isArray(func)) return console.log(func);
+    else return;
+  }
+  inorder(func = [], root = this.root) {
+    if (root === null) return;
+    this.inorder(func, root.left);
+    if (Array.isArray(func)) {
+      func.push(root.data);
+    } else {
+      func(root);
+    }
+    this.inorder(func, root.right);
+    if (Array.isArray(func) && root === this.root) return console.log(func);
+  }
+
+  preorder(func = [], root = this.root) {
+    if (root === null) return;
+    if (Array.isArray(func)) {
+      func.push(root.data);
+    } else {
+      func(root);
+    }
+    this.preorder(func, root.left);
+    this.preorder(func, root.right);
+    if (Array.isArray(func) && root === this.root) return console.log(func);
+  }
+
+  postorder(func = [], root = this.root) {
+    if (root === null) return;
+    this.postorder(func, root.left);
+    this.postorder(func, root.right);
+    if (Array.isArray(func)) {
+      func.push(root.data);
+    } else {
+      func(root);
+    }
+    if (Array.isArray(func) && root === this.root) return console.log(func);
+  }
 }
 
 const prettyPrint = (node, prefix = "", isLeft = true) => {
@@ -133,4 +186,6 @@ tree.insert(800);
 tree.insert(123);
 tree.insert(100);
 console.log(tree.find(1));
+// tree.levelOrder((n) => (n.data = n.data * 2));
+tree.postorder();
 prettyPrint(tree.root);
